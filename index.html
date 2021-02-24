@@ -1,0 +1,204 @@
+<html lang="en">
+    <head>
+        <title>
+            checking javascript
+        </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,intial">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style type="text/css">
+            *{
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+            input:focus::placeholder {
+                  color: transparent;
+            }
+            body{
+                background: rgb(2,0,36);
+                background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(41,112,62,1) 45%, rgba(0,212,255,1) 100%);
+                text-align: left;
+
+            }
+            section{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+            section .wrapper h1{
+                font-family: sans-serif;
+                font-weight: bold;
+                font-size: 40px;
+                color: white;
+                margin: 25px;
+            }
+
+
+            .wrapper{
+                width: 400px;
+                padding: 30px;
+            }
+            .wrapper .input-data{
+                height: 40px;
+                width: 100%;
+                position: relative;
+                margin: 20px;
+            }
+            .wrapper .input-data input{
+                height: 100%;
+                width: 90%;
+                border: none;
+                font-size: 17px;
+                border-radius: 15px;
+                padding-left: 15px;
+            }
+            .wrapper .input-data input:focus{
+                outline: none;
+            }
+            .wrapper .input-data button{
+                height: 100%;
+                width: 40px;
+                float: right;
+                position: relative;
+                left: -50px;
+                background: #fff;
+                border: none;
+            }
+            .wrapper .input-data button:focus{
+                outline: none;
+            }
+
+            .container{
+                width: 100%;
+                margin-top: 25px;
+
+            }
+            .container .box-container{
+                margin-right: auto;
+                margin-left: auto;
+                padding: 10px;
+
+                width: 500px;
+                display: flex;
+                justify-content: center;
+            }
+            .weather-box{
+                text-align: left;
+                padding: 15px;
+            }
+            #heading h3{
+                font-size: 38px;
+                font-weight: 700;
+
+            }
+            #heading .coord{
+                font-size: 14px;
+            }
+            #weath-data .add-data{
+                display: inline-block;
+                border-left: solid 3px maroon;
+                padding: 5px;
+            }
+            #weath-data .add-data li{
+                display: inline;
+                margin-left: 10px;
+                font-size: 16px;
+            }
+            #weather-box{
+                border-radius: 4px;
+                box-shadow:inset 4px 3px 8px 1px #969696;
+            }
+
+
+        </style>
+    </head>
+    <body>
+
+        <section>
+            <div class="wrapper">
+                <h1 class="gradient-text">Weather App</h1>
+                <div class="input-data">
+                    <input id="cityname" type="text" name="cityname" placeholder="Enter the name of City">
+                    <button id="getText"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <div class="box-container">
+                    <div class="weather-box">
+
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script type="text/javascript">
+
+            document.getElementById('getText').addEventListener('click',getText);
+            document.querySelector('#cityname').addEventListener('keyup',(event)=>{
+                if (event.keyCode === 13) {
+                event.preventDefault();
+                document.querySelector('#getText').click();
+            }
+            });
+
+            function getText(){
+                let cityname = document.getElementById('cityname').value;
+                fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=54549093b4bca9b7c9f51c7408378aef`)
+                .then((res)=> res.json())
+                .then((data)=> {
+
+
+                    let datetime = new Date(data.dt*1000);
+
+                    datetime.setUTCSeconds(data.timezone);
+
+                    let weatherBox = document.querySelector('.weather-box')
+
+                    weatherBox.innerHTML = `
+                                <div id="Heading">
+                                        <div style="color: maroon;font-weight: 400;">
+                                            <p class="datetime"></p>
+                                        </div>
+                                        <h3>${data.name}, <span>${data.sys.country}</span></h3>
+                                        <p class="coord">lat: <span>${data.coord.lat}</span>"; lon: <span>${data.coord.lon}</span>"</p>
+
+                                        <div style="width:180px;font-size: 36px;font-weight: 700;">
+                                        <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="Image of weather icon">
+                                        <span style="float:right;padding-top: 30px;">${Math.round(data.main.temp-273)}&deg;C</span>
+                                        </div>
+
+                                    </div>
+
+                                    <div id="weath-data">
+                                        <p style="font-size: 18px; font-weight: 700;">Feels like ${Math.round(data.main.feels_like-273)} &deg;C.${data.weather[0].description}</p>
+                                        <div style="margin: 15px 0;">
+                                            <p>Maximum Temperature: ${(data.main.temp_max-273).toFixed(2)} </p>
+                                            <p>Minimum Temperature: ${(data.main.temp_min-273).toFixed(2)}</p>
+                                        </div>
+                                        <ul class="add-data">
+                                            <li>Pressure: ${data.main.pressure}hPa</li>
+                                            <li>Humidity: ${data.main.humidity}%</li>
+                                            <li>Visibility: ${data.visibility/1000}Km</li>
+                                        </ul>
+                                    </div>
+                    `;
+                    weatherBox.style.cssText =`background: white; border-radius:10px;"`;
+
+
+
+                }).catch((err)=> alert(`Enter valid cityname`))
+
+            }
+
+        </script>
+
+    </body>
+
+</html>
